@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-const useDataStore = create((set) => ({
+const useDataStore = create((set, get) => ({
   rawRows: [],
   meta: null,
   isLoading: false,
@@ -68,6 +68,32 @@ const useDataStore = create((set) => ({
 
   resetFilters() {
     set(state => ({ search: '', colFilters: {}, filtersVersion: state.filtersVersion + 1 }))
+  },
+
+  async excludeDossier(dossierCode) {
+    const res = await fetch('/api/exclusions', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dossier_code: dossierCode }),
+    })
+    if (res.ok) {
+      set(state => ({ rawRows: state.rawRows.filter(r => r.dossier !== dossierCode) }))
+    }
+    return res.ok
+  },
+
+  async reincludeDossier(dossierCode) {
+    const res = await fetch('/api/exclusions/remove', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dossier_code: dossierCode }),
+    })
+    if (res.ok) {
+      await get().loadData()
+    }
+    return res.ok
   },
 }))
 

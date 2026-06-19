@@ -9,6 +9,7 @@ import ResultsTable from './ResultsTable.jsx'
 import GroupedTree from './GroupedTree.jsx'
 import ExportCsvButton from './ExportCsvButton.jsx'
 import ImportMetaBanner from './ImportMetaBanner.jsx'
+import ExclusionsPanel from './ExclusionsPanel.jsx'
 import ErrorBanner from '../shared/ErrorBanner.jsx'
 
 const cardStyle = {
@@ -72,6 +73,7 @@ export function ConsultationPage() {
             <ColumnFilters />
           </div>
         </details>
+        <ExclusionsPanel />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
           <GroupingControls allGroupIds={allGroupIds} />
           <button

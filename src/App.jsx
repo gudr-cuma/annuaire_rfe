@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import AppHeader from './components/layout/AppHeader.jsx'
 import ConsultationPage from './components/consultation/ConsultationPage.jsx'
 import ImportPage from './components/import/ImportPage.jsx'
+import useImportAuthStore from './store/useImportAuthStore.js'
 
 /** Routage minimal par pathname — 2 pages seulement, pas de dépendance react-router. */
 function useRoute() {
@@ -16,6 +17,9 @@ function useRoute() {
 
 export function App() {
   const path = useRoute()
+  const initAuth = useImportAuthStore(s => s.init)
+
+  useEffect(() => { initAuth() }, [initAuth])
 
   return (
     <>

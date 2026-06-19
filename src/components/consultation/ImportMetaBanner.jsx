@@ -1,5 +1,32 @@
-export function ImportMetaBanner({ meta }) {
-  if (!meta || !meta.imported_at) {
+const DATASET_LABELS = {
+  dossiers: 'Dossiers',
+  facturation: 'Annuaire',
+  agc: 'AGC',
+  federation: 'Fédération',
+}
+
+function formatLine(label, entry) {
+  if (!entry || !entry.imported_at) return `${label} : aucun import`
+  const date = new Date(entry.imported_at).toLocaleString('fr-FR')
+  return `${label} : ${date} (${entry.row_count})`
+}
+
+/**
+ * `meta` est la réponse de GET /api/meta : { dossiers, facturation, agc, federation }.
+ * Avec `datasetKey`, affiche uniquement ce jeu de données (usage : widget d'import).
+ * Sans `datasetKey`, affiche les 4 (usage : page de consultation).
+ */
+export function ImportMetaBanner({ meta, datasetKey }) {
+  if (datasetKey) {
+    const entry = meta && meta[datasetKey]
+    return (
+      <div style={{ fontSize: '12.5px', color: '#718096' }}>
+        {formatLine(DATASET_LABELS[datasetKey], entry)}
+      </div>
+    )
+  }
+
+  if (!meta) {
     return (
       <div style={{ fontSize: '12.5px', color: '#92400E', background: '#FFF3E0', border: '1px solid #FBBF24', borderRadius: '8px', padding: '8px 12px' }}>
         Aucun import n'a encore été effectué.
@@ -7,13 +34,11 @@ export function ImportMetaBanner({ meta }) {
     )
   }
 
-  const date = new Date(meta.imported_at).toLocaleString('fr-FR')
-
   return (
     <div style={{ fontSize: '12.5px', color: '#718096', display: 'flex', flexWrap: 'wrap', gap: '4px 16px' }}>
-      <span>Dernier import : <strong style={{ color: '#1A202C' }}>{date}</strong></span>
-      <span>Dossiers : <strong style={{ color: '#1A202C' }}>{meta.dossiers_count}</strong></span>
-      <span>Facturation : <strong style={{ color: '#1A202C' }}>{meta.facturation_count}</strong></span>
+      {Object.entries(DATASET_LABELS).map(([key, label]) => (
+        <span key={key}>{formatLine(label, meta[key])}</span>
+      ))}
     </div>
   )
 }

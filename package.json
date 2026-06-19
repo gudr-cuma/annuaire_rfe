@@ -10,8 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "pages:dev": "wrangler pages dev ./dist --port 8766",
-    "d1:migrate:local": "wrangler d1 execute annuaire-rfe-db --file=./migrations/0001_initial.sql --local",
-    "d1:migrate:remote": "wrangler d1 execute annuaire-rfe-db --file=./migrations/0001_initial.sql --remote"
+    "d1:migrate:local": "wrangler d1 execute annuaire-rfe-db --file=./migrations/0001_initial.sql --local && wrangler d1 execute annuaire-rfe-db --file=./migrations/0002_refdata_exclusions_meta.sql --local",
+    "d1:migrate:remote": "wrangler d1 execute annuaire-rfe-db --file=./migrations/0001_initial.sql --remote && wrangler d1 execute annuaire-rfe-db --file=./migrations/0002_refdata_exclusions_meta.sql --remote"
   },
   "dependencies": {
     "react": "^19.2.4",

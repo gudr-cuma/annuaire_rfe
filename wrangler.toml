@@ -7,7 +7,7 @@ pages_build_output_dir = "./dist"
 [[d1_databases]]
 binding       = "DB"
 database_name = "annuaire-rfe-db"
-database_id   = "21eb93f2-1189-40f0-9634-75734f0d0d7e"
+database_id   = "82fe91ef-b6b7-45cb-90dc-2471253fe811"
 
 # ── Variables d'environnement (non-secrètes) ──────────────────────────────────
 [vars]

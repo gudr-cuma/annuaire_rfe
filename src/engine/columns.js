@@ -1,18 +1,20 @@
 // Clés alignées sur les champs renvoyés par GET /api/dossiers (snake_case, cf. requête SQL de migrations/0001_initial.sql)
 export const COLUMNS = [
+  { key: 'dossier', label: 'Dossier' },
   { key: 'siren', label: 'SIREN' },
-  { key: 'nom', label: 'Nom' },
+  { key: 'nom', label: 'Nom', width: 368 },
+  { key: 'annuaire', label: 'Annuaire', width: 100 },
+  { key: 'plateforme', label: 'PA', width: 90 },
+  { key: 'adresse_active', label: 'Adr. active', width: 110 },
   { key: 'departement', label: 'Département' },
   { key: 'cpostal', label: 'Code postal' },
   { key: 'ville', label: 'Ville' },
   { key: 'agc', label: 'AGC' },
+  { key: 'nom_agc', label: 'Nom AGC' },
   { key: 'federation', label: 'Fédération' },
+  { key: 'nom_federation', label: 'Nom Fédération', width: 320 },
   { key: 'un_gesdosno', label: 'N° gestion dossier' },
-  { key: 'dossier', label: 'Dossier' },
-  { key: 'annuaire', label: 'Annuaire fact. électronique' },
-  { key: 'plateforme', label: 'Plateforme agréée rattachée' },
   { key: 'adresse_facturation', label: 'Adresse de facturation' },
-  { key: 'adresse_active', label: 'Adresse fact. active' },
 ]
 
 export const GROUP_FIELDS = [
