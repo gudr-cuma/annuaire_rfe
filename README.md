@@ -37,14 +37,14 @@ npm run dev
 
 # 3b. Build + Functions + D1 local ensemble (pour tester l'API et l'import) :
 npm run build
-npx wrangler pages dev ./dist
+npm run pages:dev
 ```
 
-Le serveur `wrangler pages dev` écoute par défaut sur `http://127.0.0.1:8788`.
+Le serveur `wrangler pages dev` écoute sur **`http://127.0.0.1:8766`** (port fixé explicitement dans le script `pages:dev` du `package.json` — 8788, le port par défaut de wrangler, est déjà utilisé par un autre outil sur le poste habituel de développement). Changez ce port dans `package.json` si besoin localement.
 
-> **Test du flux d'import dans un navigateur en local** : le cookie de session porte l'attribut `Secure`, qui n'est honoré par les navigateurs que sur HTTPS. Sur `http://127.0.0.1:8788` (HTTP), le cookie ne sera donc pas posé par le navigateur après la saisie du secret. Pour tester le flux complet (saisie du secret → upload) dans un navigateur en local, lancez plutôt :
+> **Test du flux d'import dans un navigateur en local** : le cookie de session porte l'attribut `Secure`, qui n'est honoré par les navigateurs que sur HTTPS. Sur `http://127.0.0.1:8766` (HTTP), le cookie ne sera donc pas posé par le navigateur après la saisie du secret. Pour tester le flux complet (saisie du secret → upload) dans un navigateur en local, lancez plutôt :
 > ```bash
-> npx wrangler pages dev ./dist --local-protocol https
+> npx wrangler pages dev ./dist --port 8766 --local-protocol https
 > ```
 > (certificat auto-signé, à accepter dans le navigateur). En production sur Cloudflare Pages, le site est servi en HTTPS donc ce point ne se pose pas. Les endpoints peuvent aussi être testés directement via `curl` sans ce problème (le cookie est transmis explicitement).
 

@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "pages:dev": "wrangler pages dev ./dist",
+    "pages:dev": "wrangler pages dev ./dist --port 8766",
     "d1:migrate:local": "wrangler d1 execute annuaire-rfe-db --file=./migrations/0001_initial.sql --local",
     "d1:migrate:remote": "wrangler d1 execute annuaire-rfe-db --file=./migrations/0001_initial.sql --remote"
   },
