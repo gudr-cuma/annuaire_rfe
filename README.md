@@ -74,3 +74,5 @@ Le serveur `wrangler pages dev` écoute sur **`http://127.0.0.1:8766`** (port fi
 ## Référence
 
 Le prototype original (`fusion_dossiers_facturation.html`) et les CSV d'exemple sont conservés à la racine du repo comme référence de non-régression de la logique métier (fusion, calcul du département, normalisation des filtres).
+
+Le brief originel (`docs/BRIEF_refonte_avec_base_de_donnees.md`) et le plan d'implémentation détaillé (`docs/PLAN_implementation.md`) sont conservés dans `docs/` pour documenter le contexte et les décisions prises pendant la conception.
