@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@theme {
+  /* Couleurs principales — charte Financiel Vision, partagée pour cohérence visuelle */
+  --color-fv-blue: #B1DCE2;
+  --color-fv-blue-light: #E3F2F5;
+
+  --color-fv-green: #31B700;
+  --color-fv-green-dark: #268E00;
+  --color-fv-green-light: #E8F5E0;
+
+  --color-fv-orange: #FF8200;
+  --color-fv-orange-dark: #E57300;
+  --color-fv-orange-light: #FFF3E0;
+
+  --color-fv-lime: #93C90E;
+  --color-fv-lime-light: #F0F7D4;
+
+  --color-fv-forest: #00965E;
+  --color-fv-red: #E53935;
+
+  /* Neutres */
+  --color-fv-bg: #FFFFFF;
+  --color-fv-bg-secondary: #F8FAFB;
+  --color-fv-border: #E2E8F0;
+  --color-fv-text: #1A202C;
+  --color-fv-text-secondary: #718096;
+
+  /* Police */
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+:root {
+  --color-blue-pastel: #B1DCE2;
+  --color-green-primary: #31B700;
+  --color-green-accessible: #268E00;
+  --color-orange-accent: #FF8200;
+  --color-green-lime: #93C90E;
+  --color-green-forest: #00965E;
+  --color-blue-light: #E3F2F5;
+  --color-green-light: #E8F5E0;
+  --color-orange-light: #FFF3E0;
+  --color-lime-light: #F0F7D4;
+  --color-bg: #FFFFFF;
+  --color-bg-secondary: #F8FAFB;
+  --color-border: #E2E8F0;
+  --color-text: #1A202C;
+  --color-text-secondary: #718096;
+  --color-red-error: #E53935;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #F8FAFB;
+  color: #1A202C;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Focus visible — anneau clavier uniquement ──────────────────────────── */
+*:focus-visible {
+  outline: 2px solid #FF8200;
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Animation spin (boutons en chargement) ─────────────────────────────── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Arborescence de regroupement (GroupedTree) ─────────────────────────── */
+.rfe-group-summary {
+  cursor: pointer;
+  user-select: none;
+}
+.rfe-group-chevron {
+  display: inline-block;
+  transition: transform 150ms;
+}
+.rfe-group-chevron.open {
+  transform: rotate(90deg);
+}
+
+/* ── Table résultats — header sticky ────────────────────────────────────── */
+.rfe-table-scroll {
+  overflow: auto;
+  max-height: 640px;
+}
+.rfe-table-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}

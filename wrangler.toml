@@ -1,0 +1,19 @@
+name = "annuaire-rfe"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "./dist"
+
+# ── Cloudflare D1 — Base de données SQLite ────────────────────────────────────
+[[d1_databases]]
+binding       = "DB"
+database_name = "annuaire-rfe-db"
+database_id   = "21eb93f2-1189-40f0-9634-75734f0d0d7e"
+
+# ── Variables d'environnement (non-secrètes) ──────────────────────────────────
+[vars]
+IMPORT_SESSION_DURATION_HOURS = "2"
+
+# ── Secrets (NE PAS mettre les valeurs ici) ───────────────────────────────────
+# En local : créer un fichier .dev.vars (jamais commité) avec IMPORT_SECRET=...
+# En production : wrangler secret put IMPORT_SECRET
+#   ou Dashboard → Pages → annuaire-rfe → Settings → Environment variables → Secret

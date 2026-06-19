@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fusion Dossiers / Facturation — SIREN</title>
+<style>
+  :root{
+    --bg:#f4f6f8; --panel:#ffffff; --border:#dde2e7; --text:#1f2733; --muted:#6b7480;
+    --accent:#2461d6; --accent-light:#e8f0fe; --ok:#1f8a4c; --warn:#c0392b; --head:#eef1f5;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--text); font-size:14px;}
+  header{background:var(--panel); border-bottom:1px solid var(--border); padding:16px 24px;}
+  h1{font-size:18px; margin:0 0 4px;}
+  .sub{color:var(--muted); font-size:12.5px; margin-bottom:14px;}
+  .upload-row{display:flex; gap:16px; flex-wrap:wrap; align-items:flex-end;}
+  .upload-box{background:var(--bg); border:1px dashed var(--border); border-radius:8px; padding:10px 14px; flex:1; min-width:260px;}
+  .upload-box label{display:block; font-weight:600; font-size:12.5px; margin-bottom:6px;}
+  .upload-box input[type=file]{font-size:12.5px; max-width:100%;}
+  .upload-status{font-size:12px; margin-top:6px; color:var(--muted);}
+  .upload-status.ok{color:var(--ok);}
+  .upload-status.err{color:var(--warn);}
+  .top-actions{display:flex; gap:8px; align-items:center;}
+  button{cursor:pointer; border:1px solid var(--border); background:var(--panel); color:var(--text); border-radius:6px; padding:7px 12px; font-size:12.5px;}
+  button:hover{background:var(--head);}
+  button.primary{background:var(--accent); border-color:var(--accent); color:#fff;}
+  button.primary:hover{background:#1d4fb5;}
+  main{padding:18px 24px 60px;}
+  .panel{background:var(--panel); border:1px solid var(--border); border-radius:10px; margin-bottom:16px;}
+  .panel-header{padding:12px 16px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;}
+  .panel-header h2{font-size:13.5px; margin:0; text-transform:uppercase; letter-spacing:.03em; color:var(--muted);}
+  .panel-body{padding:14px 16px;}
+  .controls-grid{display:flex; gap:14px; flex-wrap:wrap; align-items:center;}
+  .controls-grid .field{display:flex; flex-direction:column; gap:4px;}
+  .controls-grid label{font-size:11.5px; color:var(--muted); font-weight:600;}
+  select, input[type=search], input[type=text]{padding:6px 8px; border:1px solid var(--border); border-radius:6px; font-size:13px; background:#fff;}
+  #globalSearch{min-width:240px;}
+  .filters-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:10px;}
+  .filters-grid .field label{font-size:11px;}
+  .stat-badge{font-size:12.5px; background:var(--accent-light); color:var(--accent); padding:5px 10px; border-radius:14px; font-weight:600;}
+  table{border-collapse:collapse; width:100%; font-size:12.8px;}
+  thead th{background:var(--head); text-align:left; padding:8px 10px; border-bottom:1px solid var(--border); cursor:pointer; white-space:nowrap; user-select:none; position:sticky; top:0;}
+  thead th:hover{background:#e2e7ed;}
+  thead th .arrow{font-size:10px; color:var(--accent); margin-left:3px;}
+  tbody td{padding:6px 10px; border-bottom:1px solid #eef0f3; white-space:nowrap;}
+  tbody tr:hover{background:#f8fafc;}
+  .table-scroll{overflow:auto; max-height:560px; border:1px solid var(--border); border-radius:8px;}
+  .tag{display:inline-block; padding:1px 7px; border-radius:10px; font-size:11px; font-weight:600;}
+  .tag.oui{background:#e7f6ec; color:var(--ok);}
+  .tag.non{background:#fbeae8; color:var(--warn);}
+  .tag.na{background:#eef1f5; color:var(--muted);}
+  details{border:1px solid var(--border); border-radius:8px; margin-bottom:8px; background:#fff;}
+  details > summary{padding:9px 12px; cursor:pointer; font-weight:600; font-size:13px; list-style:none; display:flex; justify-content:space-between; align-items:center;}
+  details > summary::-webkit-details-marker{display:none;}
+  details > summary::before{content:"▸"; margin-right:8px; color:var(--accent); display:inline-block; transition:transform .15s;}
+  details[open] > summary::before{transform:rotate(90deg);}
+  details > summary .count{color:var(--muted); font-weight:500; font-size:12px;}
+  .group-children, .group-table-wrap{padding:0 12px 12px 24px;}
+  .empty-state{padding:40px 20px; text-align:center; color:var(--muted);}
+  .empty-state strong{display:block; font-size:15px; color:var(--text); margin-bottom:6px;}
+  footer{color:var(--muted); font-size:11.5px; text-align:center; padding:14px;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Fusion Dossiers / Facturation — par SIREN</h1>
+  <div class="sub" id="metaInfo">Aucune donnée chargée pour le moment.</div>
+  <div class="upload-row">
+    <div class="upload-box">
+      <label for="fileDossier">Fichier Dossiers (SIREN;NOM;CPOSTAL;VIL;UN_GESDOSNO;DOSSIER;FEDERATION;AGC — séparateur « ; »)</label>
+      <input type="file" id="fileDossier" accept=".csv,.txt">
+      <div class="upload-status" id="statusDossier">Aucun fichier chargé.</div>
+    </div>
+    <div class="upload-box">
+      <label for="fileFacturation">Fichier Facturation (SIREN + statuts facturation électronique — séparateur « , »)</label>
+      <input type="file" id="fileFacturation" accept=".csv,.txt">
+      <div class="upload-status" id="statusFacturation">Aucun fichier chargé.</div>
+    </div>
+    <div class="top-actions">
+      <button id="btnClear">Effacer les données</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="appArea" style="display:none;">
+
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Recherche &amp; regroupement</h2>
+        <span class="stat-badge" id="countBadge">0 / 0 dossiers</span>
+      </div>
+      <div class="panel-body">
+        <div class="controls-grid">
+          <div class="field">
+            <label for="globalSearch">Recherche globale</label>
+            <input type="search" id="globalSearch" placeholder="Rechercher dans toutes les colonnes…">
+          </div>
+          <div class="field">
+            <label for="group1">Regroupement — niveau 1</label>
+            <select id="group1"></select>
+          </div>
+          <div class="field">
+            <label for="group2">Regroupement — niveau 2</label>
+            <select id="group2"></select>
+          </div>
+          <div class="field">
+            <label for="group3">Regroupement — niveau 3</label>
+            <select id="group3"></select>
+          </div>
+          <div class="field">
+            <label>&nbsp;</label>
+            <div style="display:flex; gap:8px;">
+              <button id="btnExpandAll">Tout déplier</button>
+              <button id="btnCollapseAll">Tout replier</button>
+              <button id="btnResetFilters">Réinitialiser filtres</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Filtres par colonne</h2>
+      </div>
+      <div class="panel-body">
+        <div class="filters-grid" id="filtersGrid"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Résultats</h2>
+      </div>
+      <div class="panel-body" id="resultsArea"></div>
+    </div>
+
+  </div>
+
+  <div class="empty-state" id="emptyState">
+    <strong>En attente des deux fichiers</strong>
+    Charge le fichier Dossiers et le fichier Facturation ci-dessus pour générer le tableau fusionné.<br>
+    Les données restent ensuite enregistrées dans ce navigateur : tu peux fermer la page et la rouvrir sans tout recharger.
+  </div>
+</main>
+
+<footer>Traitement 100% local dans le navigateur — aucune donnée n'est envoyée vers un serveur.</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Column definitions ----------
+  var COLUMNS = [
+    {key:'SIREN', label:'SIREN'},
+    {key:'NOM', label:'Nom'},
+    {key:'DEPARTEMENT', label:'Département'},
+    {key:'CPOSTAL', label:'Code postal'},
+    {key:'VIL', label:'Ville'},
+    {key:'AGC', label:'AGC'},
+    {key:'FEDERATION', label:'Fédération'},
+    {key:'UN_GESDOSNO', label:'N° gestion dossier'},
+    {key:'DOSSIER', label:'Dossier'},
+    {key:'annuaire', label:'Annuaire fact. électronique'},
+    {key:'plateforme', label:'Plateforme agréée rattachée'},
+    {key:'adresseFacturation', label:'Adresse de facturation'},
+    {key:'adresseActive', label:'Adresse fact. active'}
+  ];
+  var GROUP_FIELDS = [
+    {key:'', label:'Aucun regroupement'},
+    {key:'AGC', label:'AGC'},
+    {key:'FEDERATION', label:'Fédération'},
+    {key:'DEPARTEMENT', label:'Département'}
+  ];
+  var BOOL_COLUMNS = {annuaire:1, plateforme:1, adresseActive:1};
+  var EMPTY_FILTER = '__EMPTY__';
+
+  // ---------- State ----------
+  var dossierRaw = null;       // {headers, rows, filename, loadedAt}
+  var facturationRaw = null;   // {headers, rows, filename, loadedAt}
+  var merged = [];             // merged dataset
+  var state = {
+    search: '',
+    colFilters: {},
+    group: ['', '', ''],
+    sortKey: 'NOM',
+    sortDir: 'asc'
+  };
+
+  // ---------- Helpers ----------
+  function normalize(s){
+    return (s||'').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+  }
+  function $(id){ return document.getElementById(id); }
+  function esc(s){
+    return (s===undefined||s===null?'':String(s)).replace(/[&<>"]/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];
+    });
+  }
+
+  function parseCSV(text, delimiter){
+    text = text.replace(/^﻿/, '');
+    var lines = text.split(/\r\n|\n|\r/).filter(function(l){ return l.length > 0; });
+    if (lines.length === 0) return {headers:[], rows:[]};
+    function parseLine(line){
+      var result = [], cur = '', inQuotes = false;
+      for (var i = 0; i < line.length; i++){
+        var ch = line[i];
+        if (inQuotes){
+          if (ch === '"'){
+            if (line[i+1] === '"'){ cur += '"'; i++; }
+            else inQuotes = false;
+          } else cur += ch;
+        } else {
+          if (ch === '"') inQuotes = true;
+          else if (ch === delimiter){ result.push(cur); cur = ''; }
+          else cur += ch;
+        }
+      }
+      result.push(cur);
+      return result.map(function(v){ return v.trim(); });
+    }
+    var headers = parseLine(lines[0]);
+    var rows = lines.slice(1).map(parseLine);
+    return {headers: headers, rows: rows};
+  }
+
+  function detectDelimiter(firstLine){
+    var semi = (firstLine.match(/;/g)||[]).length;
+    var comma = (firstLine.match(/,/g)||[]).length;
+    return semi >= comma ? ';' : ',';
+  }
+
+  function buildMerged(){
+    if (!dossierRaw || !facturationRaw) { merged = []; return; }
+    var facMap = new Map();
+    facturationRaw.rows.forEach(function(r){
+      var siren = (r[0]||'').trim();
+      if (siren && !facMap.has(siren)) facMap.set(siren, r);
+    });
+    merged = dossierRaw.rows.map(function(r){
+      var siren = (r[0]||'').trim();
+      var cp = (r[2]||'').trim();
+      var dept = /^\d{2}/.test(cp) ? cp.slice(0,2) : 'N/D';
+      var fac = facMap.get(siren);
+      return {
+        SIREN: siren,
+        NOM: (r[1]||'').trim(),
+        CPOSTAL: cp,
+        DEPARTEMENT: dept,
+        VIL: (r[3]||'').trim(),
+        UN_GESDOSNO: (r[4]||'').trim(),
+        DOSSIER: (r[5]||'').trim(),
+        FEDERATION: (r[6]||'').trim(),
+        AGC: (r[7]||'').trim(),
+        annuaire: fac ? (fac[1]||'').trim() : '',
+        plateforme: fac ? (fac[2]||'').trim() : '',
+        adresseFacturation: fac ? (fac[3]||'').trim() : '',
+        adresseActive: fac ? (fac[4]||'').trim() : ''
+      };
+    });
+  }
+
+  // ---------- Persistence ----------
+  function saveToStorage(){
+    try{
+      if (dossierRaw) localStorage.setItem('fdf_dossierRaw', JSON.stringify(dossierRaw));
+      if (facturationRaw) localStorage.setItem('fdf_facturationRaw', JSON.stringify(facturationRaw));
+      localStorage.setItem('fdf_lastUpdate', new Date().toISOString());
+    }catch(e){
+      console.warn('Stockage local indisponible ou plein :', e);
+    }
+  }
+  function loadFromStorage(){
+    try{
+      var d = localStorage.getItem('fdf_dossierRaw');
+      var f = localStorage.getItem('fdf_facturationRaw');
+      if (d) dossierRaw = JSON.parse(d);
+      if (f) facturationRaw = JSON.parse(f);
+    }catch(e){ console.warn(e); }
+  }
+  function clearStorage(){
+    localStorage.removeItem('fdf_dossierRaw');
+    localStorage.removeItem('fdf_facturationRaw');
+    localStorage.removeItem('fdf_lastUpdate');
+    dossierRaw = null; facturationRaw = null; merged = [];
+    $('fileDossier').value = ''; $('fileFacturation').value = '';
+    $('statusDossier').textContent = 'Aucun fichier chargé.';
+    $('statusDossier').className = 'upload-status';
+    $('statusFacturation').textContent = 'Aucun fichier chargé.';
+    $('statusFacturation').className = 'upload-status';
+    refreshAfterDataChange();
+  }
+
+  // ---------- File handling ----------
+  function handleFile(file, role){
+    var statusEl = role === 'dossier' ? $('statusDossier') : $('statusFacturation');
+    var reader = new FileReader();
+    reader.onload = function(e){
+      try{
+        var text = e.target.result;
+        var firstLine = text.split(/\r\n|\n|\r/)[0] || '';
+        var delim = detectDelimiter(firstLine);
+        var parsed = parseCSV(text, delim);
+        var expectedCols = role === 'dossier' ? 8 : 5;
+        if (parsed.headers.length < expectedCols){
+          statusEl.textContent = 'Format inattendu (' + parsed.headers.length + ' colonnes au lieu de ' + expectedCols + '). Fichier ignoré.';
+          statusEl.className = 'upload-status err';
+          return;
+        }
+        var record = {headers: parsed.headers, rows: parsed.rows, filename: file.name, loadedAt: new Date().toISOString()};
+        if (role === 'dossier') dossierRaw = record; else facturationRaw = record;
+        statusEl.textContent = '✓ ' + file.name + ' — ' + parsed.rows.length + ' lignes chargées.';
+        statusEl.className = 'upload-status ok';
+        saveToStorage();
+        refreshAfterDataChange();
+      }catch(err){
+        statusEl.textContent = 'Erreur de lecture du fichier : ' + err.message;
+        statusEl.className = 'upload-status err';
+      }
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  function refreshAfterDataChange(){
+    buildMerged();
+    updateMetaInfo();
+    if (merged.length > 0){
+      $('appArea').style.display = '';
+      $('emptyState').style.display = 'none';
+      render();
+    } else {
+      $('appArea').style.display = 'none';
+      $('emptyState').style.display = '';
+    }
+  }
+
+  function updateMetaInfo(){
+    var parts = [];
+    if (dossierRaw) parts.push('Dossiers : ' + esc(dossierRaw.filename) + ' (' + dossierRaw.rows.length + ' lignes, chargé ' + new Date(dossierRaw.loadedAt).toLocaleString('fr-FR') + ')');
+    else parts.push('Dossiers : non chargé');
+    if (facturationRaw) parts.push('Facturation : ' + esc(facturationRaw.filename) + ' (' + facturationRaw.rows.length + ' lignes, chargé ' + new Date(facturationRaw.loadedAt).toLocaleString('fr-FR') + ')');
+    else parts.push('Facturation : non chargé');
+    $('metaInfo').innerHTML = parts.join(' &nbsp;·&nbsp; ');
+  }
+
+  // ---------- Controls setup ----------
+  function setupControls(){
+    ['group1','group2','group3'].forEach(function(id, idx){
+      var sel = $(id);
+      sel.innerHTML = GROUP_FIELDS.map(function(g){ return '<option value="'+g.key+'">'+g.label+'</option>'; }).join('');
+      sel.addEventListener('change', function(){
+        state.group[idx] = sel.value;
+        render();
+      });
+    });
+
+    var filtersGrid = $('filtersGrid');
+    filtersGrid.innerHTML = COLUMNS.map(function(c){
+      if (BOOL_COLUMNS[c.key]){
+        return '<div class="field"><label>'+esc(c.label)+'</label>' +
+          '<select data-colkey="'+c.key+'">' +
+            '<option value="">Tous</option>' +
+            '<option value="Oui">Oui</option>' +
+            '<option value="Non">Non</option>' +
+            '<option value="'+EMPTY_FILTER+'">Non renseigné</option>' +
+          '</select></div>';
+      }
+      return '<div class="field"><label>'+esc(c.label)+'</label><input type="text" data-colkey="'+c.key+'" placeholder="Filtrer…"></div>';
+    }).join('');
+    filtersGrid.querySelectorAll('input').forEach(function(inp){
+      inp.addEventListener('input', debounce(function(){
+        state.colFilters[inp.dataset.colkey] = inp.value;
+        render();
+      }, 150));
+    });
+    filtersGrid.querySelectorAll('select').forEach(function(sel){
+      sel.addEventListener('change', function(){
+        state.colFilters[sel.dataset.colkey] = sel.value;
+        render();
+      });
+    });
+
+    $('globalSearch').addEventListener('input', debounce(function(){
+      state.search = $('globalSearch').value;
+      render();
+    }, 150));
+
+    $('btnExpandAll').addEventListener('click', function(){
+      document.querySelectorAll('#resultsArea details').forEach(function(d){ d.open = true; });
+    });
+    $('btnCollapseAll').addEventListener('click', function(){
+      document.querySelectorAll('#resultsArea details').forEach(function(d){ d.open = false; });
+    });
+    $('btnResetFilters').addEventListener('click', function(){
+      state.search = ''; state.colFilters = {};
+      $('globalSearch').value = '';
+      filtersGrid.querySelectorAll('input, select').forEach(function(i){ i.value = ''; });
+      render();
+    });
+    $('btnClear').addEventListener('click', function(){
+      if (confirm('Effacer les données chargées de ce navigateur ?')) clearStorage();
+    });
+
+    $('fileDossier').addEventListener('change', function(e){
+      if (e.target.files[0]) handleFile(e.target.files[0], 'dossier');
+    });
+    $('fileFacturation').addEventListener('change', function(e){
+      if (e.target.files[0]) handleFile(e.target.files[0], 'facturation');
+    });
+  }
+
+  function debounce(fn, ms){
+    var t;
+    return function(){
+      var args = arguments;
+      clearTimeout(t);
+      t = setTimeout(function(){ fn.apply(null, args); }, ms);
+    };
+  }
+
+  // ---------- Filtering / sorting ----------
+  function applyFilters(rows){
+    var search = normalize(state.search);
+    var colKeys = Object.keys(state.colFilters).filter(function(k){ return state.colFilters[k]; });
+    return rows.filter(function(r){
+      if (search){
+        var hit = COLUMNS.some(function(c){ return normalize(r[c.key]).indexOf(search) !== -1; });
+        if (!hit) return false;
+      }
+      for (var i = 0; i < colKeys.length; i++){
+        var k = colKeys[i];
+        var fv = state.colFilters[k];
+        if (fv === EMPTY_FILTER){
+          if (r[k]) return false;
+        } else if (normalize(r[k]).indexOf(normalize(fv)) === -1){
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+
+  function sortRows(rows){
+    var key = state.sortKey, dir = state.sortDir === 'asc' ? 1 : -1;
+    return rows.slice().sort(function(a, b){
+      return dir * String(a[key]||'').localeCompare(String(b[key]||''), 'fr', {numeric:true, sensitivity:'base'});
+    });
+  }
+
+  // ---------- Rendering ----------
+  function tagHtml(val){
+    var v = normalize(val);
+    if (v === 'oui') return '<span class="tag oui">Oui</span>';
+    if (v === 'non') return '<span class="tag non">Non</span>';
+    if (!val) return '<span class="tag na">—</span>';
+    return esc(val);
+  }
+
+  function renderTableHTML(rows){
+    var thead = '<thead><tr>' + COLUMNS.map(function(c){
+      var arrow = '';
+      if (state.sortKey === c.key) arrow = '<span class="arrow">' + (state.sortDir === 'asc' ? '▲' : '▼') + '</span>';
+      return '<th data-key="'+c.key+'">' + esc(c.label) + arrow + '</th>';
+    }).join('') + '</tr></thead>';
+    var tbody = '<tbody>' + rows.map(function(r){
+      return '<tr>' + COLUMNS.map(function(c){
+        var v = r[c.key];
+        return '<td>' + (BOOL_COLUMNS[c.key] ? tagHtml(v) : esc(v)) + '</td>';
+      }).join('') + '</tr>';
+    }).join('') + '</tbody>';
+    return '<div class="table-scroll"><table>' + thead + tbody + '</table></div>';
+  }
+
+  function groupBy(rows, key){
+    var map = new Map();
+    rows.forEach(function(r){
+      var v = r[key] || 'N/D';
+      if (!map.has(v)) map.set(v, []);
+      map.get(v).push(r);
+    });
+    return map;
+  }
+
+  function fieldLabel(key){
+    var f = GROUP_FIELDS.filter(function(g){ return g.key === key; })[0];
+    return f ? f.label : key;
+  }
+
+  function renderGroupedHTML(rows, levels, levelIdx){
+    if (levelIdx >= levels.length || !levels[levelIdx]){
+      return '<div class="group-table-wrap">' + renderTableHTML(sortRows(rows)) + '</div>';
+    }
+    var key = levels[levelIdx];
+    var map = groupBy(rows, key);
+    var keys = Array.from(map.keys()).sort(function(a, b){
+      if (a === 'N/D') return 1;
+      if (b === 'N/D') return -1;
+      return String(a).localeCompare(String(b), 'fr', {numeric:true});
+    });
+    return '<div class="group-children">' + keys.map(function(k){
+      var groupRows = map.get(k);
+      var id = 'grp_' + levelIdx + '_' + btoa(unescape(encodeURIComponent(k))).replace(/[^a-zA-Z0-9]/g,'');
+      return '<details id="'+id+'"><summary>' +
+        '<span>' + esc(fieldLabel(key)) + ' : ' + esc(k) + '</span>' +
+        '<span class="count">' + groupRows.length + ' dossier' + (groupRows.length > 1 ? 's' : '') + '</span>' +
+        '</summary>' + renderGroupedHTML(groupRows, levels, levelIdx + 1) + '</details>';
+    }).join('') + '</div>';
+  }
+
+  function render(){
+    var filtered = applyFilters(merged);
+    $('countBadge').textContent = filtered.length + ' / ' + merged.length + ' dossiers';
+    var levels = state.group.filter(function(g){ return g; });
+    var html;
+    if (levels.length === 0){
+      html = renderTableHTML(sortRows(filtered));
+    } else {
+      html = renderGroupedHTML(filtered, levels, 0);
+    }
+    $('resultsArea').innerHTML = html;
+
+    $('resultsArea').querySelectorAll('thead th').forEach(function(th){
+      th.addEventListener('click', function(){
+        var key = th.dataset.key;
+        if (state.sortKey === key) state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+        else { state.sortKey = key; state.sortDir = 'asc'; }
+        render();
+      });
+    });
+  }
+
+  // ---------- Init ----------
+  function init(){
+    setupControls();
+    loadFromStorage();
+    refreshAfterDataChange();
+  }
+  document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+</body>
+</html>
