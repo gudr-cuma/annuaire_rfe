@@ -1,7 +1,7 @@
 // Clés alignées sur les champs renvoyés par GET /api/dossiers (snake_case, cf. requête SQL de migrations/0001_initial.sql)
 export const COLUMNS = [
-  { key: 'dossier', label: 'Dossier' },
-  { key: 'siren', label: 'SIREN' },
+  { key: 'dossier', label: 'Dossier', width: 120 },
+  { key: 'siren', label: 'SIREN', width: 110 },
   { key: 'nom', label: 'Nom', width: 368 },
   { key: 'annuaire', label: 'Annuaire', width: 100 },
   { key: 'plateforme', label: 'PA', width: 90 },

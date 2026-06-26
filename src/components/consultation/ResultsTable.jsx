@@ -13,8 +13,31 @@ const ACTIONS_INSERT_INDEX = MAIN_COLS.findIndex(c => c.key === ACTIONS_BEFORE_K
 const MAIN_COLS_BEFORE = MAIN_COLS.slice(0, ACTIONS_INSERT_INDEX)
 const MAIN_COLS_AFTER = MAIN_COLS.slice(ACTIONS_INSERT_INDEX)
 
+const STICKY_KEYS = ['dossier', 'siren', 'nom']
+// Calcule le décalage left de chaque colonne sticky (cumul des largeurs précédentes)
+const STICKY_LEFT = (() => {
+  const map = {}
+  let acc = 0
+  for (const c of MAIN_COLS) {
+    if (STICKY_KEYS.includes(c.key)) {
+      map[c.key] = acc
+    }
+    if (c.width) acc += c.width
+  }
+  return map
+})()
+
 function widthStyle(c) {
   return c.width ? { width: c.width, maxWidth: c.width, overflow: 'hidden', textOverflow: 'ellipsis' } : {}
+}
+
+function stickyStyle(c) {
+  if (!STICKY_KEYS.includes(c.key)) return {}
+  return {
+    position: 'sticky',
+    left: STICKY_LEFT[c.key],
+    zIndex: 2,
+  }
 }
 
 const cellBase = {
@@ -32,7 +55,7 @@ function HeaderCell({ c, sortKey, sortDir, setSort }) {
         textAlign: 'left', padding: '8px 12px', background: '#F8FAFB', color: '#718096',
         textTransform: 'uppercase', fontWeight: 700, fontSize: '12px',
         borderBottom: '2px solid #E2E8F0', cursor: 'pointer', whiteSpace: 'nowrap',
-        userSelect: 'none', ...widthStyle(c),
+        userSelect: 'none', ...widthStyle(c), ...stickyStyle(c),
       }}
     >
       {c.label}
@@ -45,7 +68,10 @@ function HeaderCell({ c, sortKey, sortDir, setSort }) {
 
 function DataCell({ c, row }) {
   return (
-    <td title={c.width ? (row[c.key] || '') : undefined} style={{ ...cellBase, ...widthStyle(c) }}>
+    <td
+      title={c.width ? (row[c.key] || '') : undefined}
+      style={{ ...cellBase, ...widthStyle(c), ...stickyStyle(c), background: STICKY_KEYS.includes(c.key) ? '#fff' : undefined }}
+    >
       {BOOL_COLUMNS[c.key] ? <StatusTag value={row[c.key]} /> : (row[c.key] || '')}
     </td>
   )
@@ -103,12 +129,12 @@ function CommentCell({ dossierCode, value, canEdit }) {
   }
 
   if (!canEdit) {
-    return <td style={{ ...cellBase, color: '#CBD5E0', minWidth: '120px' }}>—</td>
+    return <td style={{ ...cellBase, color: '#CBD5E0', minWidth: '360px' }}>—</td>
   }
 
   if (editing) {
     return (
-      <td style={{ padding: '4px 8px', borderBottom: '1px solid #F0F0F0', minWidth: '140px' }}>
+      <td style={{ padding: '4px 8px', borderBottom: '1px solid #F0F0F0', minWidth: '420px' }}>
         <input
           ref={inputRef}
           type="text"
@@ -131,7 +157,7 @@ function CommentCell({ dossierCode, value, canEdit }) {
   return (
     <td
       onClick={() => setEditing(true)}
-      style={{ ...cellBase, cursor: 'text', minWidth: '140px', whiteSpace: 'normal' }}
+      style={{ ...cellBase, cursor: 'text', minWidth: '420px', whiteSpace: 'normal' }}
     >
       {text || <span style={{ color: '#CBD5E0', fontStyle: 'italic', fontSize: '12px' }}>Ajouter…</span>}
     </td>
