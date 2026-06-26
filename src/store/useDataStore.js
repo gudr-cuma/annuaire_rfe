@@ -18,7 +18,7 @@ const useDataStore = create((set, get) => ({
     set({ isLoading: true, loadError: null })
     try {
       const [dossiersRes, metaRes] = await Promise.all([
-        fetch('/api/dossiers'),
+        fetch('/api/dossiers', { credentials: 'same-origin' }),
         fetch('/api/meta'),
       ])
       if (!dossiersRes.ok) throw new Error(`Erreur ${dossiersRes.status} lors du chargement des données`)
@@ -94,6 +94,14 @@ const useDataStore = create((set, get) => ({
       await get().loadData()
     }
     return res.ok
+  },
+
+  updateRowStatus(dossierCode, fields) {
+    set(state => ({
+      rawRows: state.rawRows.map(r =>
+        r.dossier === dossierCode ? { ...r, ...fields } : r
+      ),
+    }))
   },
 }))
 

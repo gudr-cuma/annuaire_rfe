@@ -15,6 +15,10 @@ export const COLUMNS = [
   { key: 'nom_federation', label: 'Nom Fédération', width: 320 },
   { key: 'un_gesdosno', label: 'N° gestion dossier' },
   { key: 'adresse_facturation', label: 'Adresse de facturation' },
+  // Colonnes statut — affichées uniquement si authentifié
+  { key: 'formulaire_rempli', label: 'Formulaire', statusColumn: true },
+  { key: 'justificatifs_envoyes', label: 'Justificatifs', statusColumn: true },
+  { key: 'commentaire', label: 'Commentaire', statusColumn: true },
 ]
 
 export const GROUP_FIELDS = [
@@ -24,7 +28,13 @@ export const GROUP_FIELDS = [
   { key: 'departement', label: 'Département' },
 ]
 
-export const BOOL_COLUMNS = { annuaire: 1, plateforme: 1, adresse_active: 1 }
+export const BOOL_COLUMNS = {
+  annuaire: 1,
+  plateforme: 1,
+  adresse_active: 1,
+  formulaire_rempli: 1,
+  justificatifs_envoyes: 1,
+}
 
 export const EMPTY_FILTER = '__EMPTY__'
 
