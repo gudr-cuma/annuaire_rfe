@@ -1,12 +1,17 @@
+import { webcrypto } from 'node:crypto'
+
 const DEFAULT_ITERATIONS = 100000
 const KEY_LENGTH = 32
 
+// webcrypto importé explicitement pour éviter le shadowing par nodejs_compat
+const subtle = webcrypto.subtle
+
 async function deriveKey(password, salt, iterations) {
   const enc = new TextEncoder()
-  const keyMaterial = await crypto.subtle.importKey(
+  const keyMaterial = await subtle.importKey(
     'raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']
   )
-  const bits = await crypto.subtle.deriveBits(
+  const bits = await subtle.deriveBits(
     { name: 'PBKDF2', hash: 'SHA-256', salt: enc.encode(salt), iterations },
     keyMaterial, KEY_LENGTH * 8
   )
