@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import AppHeader from './components/layout/AppHeader.jsx'
-import ConsultationPage from './components/consultation/ConsultationPage.jsx'
+import MainTabs from './components/layout/MainTabs.jsx'
 import ImportPage from './components/import/ImportPage.jsx'
 import useImportAuthStore from './store/useImportAuthStore.js'
 
@@ -24,7 +24,7 @@ export function App() {
   return (
     <>
       <AppHeader />
-      {path === '/import' ? <ImportPage /> : <ConsultationPage />}
+      {path === '/import' ? <ImportPage /> : <MainTabs />}
     </>
   )
 }
