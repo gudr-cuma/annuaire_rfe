@@ -22,7 +22,7 @@ Quatre fonctionnalités indépendantes mais liées par le même système d'authe
 - Les données de statut (cases + commentaire) sont **liées au code `dossier`** et survivent aux ré-imports complets (même pattern que `excluded_dossiers`).
 - L'import reste protégé par `IMPORT_SECRET` — les deux mécanismes d'auth coexistent sans interférence.
 - Les colonnes statut/commentaire sont **entièrement masquées** pour les utilisateurs non connectés.
-- Un utilisateur connecté **voit toutes les lignes** mais ne peut modifier que les dossiers de ses départements autorisés. Les autres lignes affichent 🔒 dans ces colonnes.
+- Un utilisateur connecté **ne voit que les lignes des départements auxquels il est assigné**. S'il n'a aucun département assigné, il voit toutes les lignes. L'admin voit toutes les lignes sans restriction. *(Décision amendée le 2026-06-26 — voir spec droits-acces-donnees.)* Les lignes hors-périmètre affichent 🔒 dans les colonnes statut.
 - L'admin UI est dans l'appli (route `/admin`), accessible uniquement au rôle `admin`.
 
 ---
@@ -140,6 +140,8 @@ Binding KV à créer : `RATE_LIMIT_KV` (utilisé pour le rate limiting login par
 ### Modification GET `/api/dossiers`
 
 La requête SQL ajoute un `LEFT JOIN dossier_status` uniquement si la session est valide (le middleware injecte `context.data.user`). Si non authentifié, les champs `formulaire_rempli`, `justificatifs_envoyes`, `commentaire` sont absents de la réponse.
+
+Quand non authentifié, les colonnes `agc`, `nom_agc`, `federation`, `nom_federation` sont également exclues du `SELECT`. Quand l'utilisateur a des départements assignés (et n'est pas admin), un filtre `WHERE d.departement IN (…)` restreint les résultats aux lignes autorisées. *(Voir spec droits-acces-donnees pour le détail complet.)*
 
 ---
 
