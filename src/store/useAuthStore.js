@@ -55,6 +55,7 @@ const useAuthStore = create((set) => ({
     set({ user: null, departments: [] })
     // Reload dossiers without status columns
     const { default: useDataStore } = await import('./useDataStore.js')
+    useDataStore.setState({ rawRows: [], group: ['', '', ''] })
     useDataStore.getState().loadData()
   },
 }))

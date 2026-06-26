@@ -47,6 +47,7 @@ export function ColumnFilters() {
   const autocompleteOptions = useMemo(() => {
     const map = {}
     for (const col of COLUMNS) {
+      if (col.refColumn && !user) continue
       if (BOOL_COLUMNS[col.key] || col.statusColumn) continue
       const vals = new Set()
       for (const row of rawRows) {
@@ -56,10 +57,11 @@ export function ColumnFilters() {
       map[col.key] = [...vals].sort((a, b) => a.localeCompare(b, 'fr'))
     }
     return map
-  }, [rawRows])
+  }, [rawRows, user])
 
   const visibleCols = COLUMNS.filter(c => {
     if (c.statusColumn) return !!user && (c.key === 'formulaire_rempli' || c.key === 'justificatifs_envoyes')
+    if (c.refColumn && !user) return false
     return true
   })
 

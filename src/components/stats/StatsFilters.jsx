@@ -1,4 +1,5 @@
 import { NO_FEDERATION, NO_AGC } from '../../engine/stats.js'
+import useAuthStore from '../../store/useAuthStore.js'
 
 const cardStyle = {
   background: '#FFFFFF',
@@ -49,6 +50,7 @@ function CheckboxList({ label, items, selected, onChange }) {
 
 /** Panneau de filtres indépendant de l'onglet Statistiques (dept / fédération / AGC). */
 export function StatsFilters({ options, value, onChange, onReset }) {
+  const user = useAuthStore(s => s.user)
   const deptItems = options.departements.map(d => ({ value: d, label: d }))
   const fedItems = [
     ...options.federations.map(f => ({ value: f.code, label: f.nom ? `${f.code} — ${f.nom}` : f.code })),
@@ -65,8 +67,8 @@ export function StatsFilters({ options, value, onChange, onReset }) {
     <div style={cardStyle}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
         <CheckboxList label="Département" items={deptItems} selected={value.departements} onChange={v => onChange('departements', v)} />
-        <CheckboxList label="Fédération" items={fedItems} selected={value.federations} onChange={v => onChange('federations', v)} />
-        <CheckboxList label="AGC" items={agcItems} selected={value.agcs} onChange={v => onChange('agcs', v)} />
+        {user && <CheckboxList label="Fédération" items={fedItems} selected={value.federations} onChange={v => onChange('federations', v)} />}
+        {user && <CheckboxList label="AGC" items={agcItems} selected={value.agcs} onChange={v => onChange('agcs', v)} />}
       </div>
       <div>
         <button

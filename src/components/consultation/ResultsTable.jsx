@@ -9,9 +9,6 @@ const MAIN_COLS = COLUMNS.filter(c => !c.statusColumn)
 const STATUS_COLS = COLUMNS.filter(c => c.statusColumn)
 
 const ACTIONS_BEFORE_KEY = 'departement'
-const ACTIONS_INSERT_INDEX = MAIN_COLS.findIndex(c => c.key === ACTIONS_BEFORE_KEY)
-const MAIN_COLS_BEFORE = MAIN_COLS.slice(0, ACTIONS_INSERT_INDEX)
-const MAIN_COLS_AFTER = MAIN_COLS.slice(ACTIONS_INSERT_INDEX)
 
 const STICKY_KEYS = ['dossier', 'siren', 'nom']
 // Calcule le décalage left de chaque colonne sticky (cumul des largeurs précédentes)
@@ -173,6 +170,11 @@ export function ResultsTable({ rows }) {
   const user = useAuthStore(s => s.user)
   const departments = useAuthStore(s => s.departments)
 
+  const visibleMainCols = user ? MAIN_COLS : MAIN_COLS.filter(c => !c.refColumn)
+  const insertIdx = visibleMainCols.findIndex(c => c.key === ACTIONS_BEFORE_KEY)
+  const colsBefore = visibleMainCols.slice(0, insertIdx)
+  const colsAfter = visibleMainCols.slice(insertIdx)
+
   function canEditRow(row) {
     if (!user) return false
     if (user.role === 'admin') return true
@@ -190,11 +192,11 @@ export function ResultsTable({ rows }) {
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
         <thead>
           <tr>
-            {MAIN_COLS_BEFORE.map(c => (
+            {colsBefore.map(c => (
               <HeaderCell key={c.key} c={c} sortKey={sortKey} sortDir={sortDir} setSort={setSort} />
             ))}
             {authenticated && <th style={thBase}>Actions</th>}
-            {MAIN_COLS_AFTER.map(c => (
+            {colsAfter.map(c => (
               <HeaderCell key={c.key} c={c} sortKey={sortKey} sortDir={sortDir} setSort={setSort} />
             ))}
             {user && STATUS_COLS.map(c => (
@@ -209,7 +211,7 @@ export function ResultsTable({ rows }) {
             const editable = canEditRow(r)
             return (
               <tr key={`${r.siren}-${r.dossier}-${i}`}>
-                {MAIN_COLS_BEFORE.map(c => <DataCell key={c.key} c={c} row={r} />)}
+                {colsBefore.map(c => <DataCell key={c.key} c={c} row={r} />)}
                 {authenticated && (
                   <td style={{ padding: '7px 12px', borderBottom: '1px solid #F0F0F0', whiteSpace: 'nowrap' }}>
                     <button
@@ -224,7 +226,7 @@ export function ResultsTable({ rows }) {
                     </button>
                   </td>
                 )}
-                {MAIN_COLS_AFTER.map(c => <DataCell key={c.key} c={c} row={r} />)}
+                {colsAfter.map(c => <DataCell key={c.key} c={c} row={r} />)}
                 {user && (
                   <>
                     <CheckboxCell

@@ -1,5 +1,6 @@
 import { GROUP_FIELDS } from '../../engine/columns.js'
 import useDataStore from '../../store/useDataStore.js'
+import useAuthStore from '../../store/useAuthStore.js'
 
 const selectStyle = {
   padding: '7px 10px',
@@ -26,6 +27,11 @@ export function GroupingControls({ allGroupIds }) {
   const group = useDataStore(s => s.group)
   const setGroupLevel = useDataStore(s => s.setGroupLevel)
   const setAllGroupsExpanded = useDataStore(s => s.setAllGroupsExpanded)
+  const user = useAuthStore(s => s.user)
+
+  const visibleGroupFields = user
+    ? GROUP_FIELDS
+    : GROUP_FIELDS.filter(g => !g.refColumn)
 
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px' }}>
@@ -36,7 +42,7 @@ export function GroupingControls({ allGroupIds }) {
           onChange={e => setGroupLevel(idx, e.target.value)}
           style={selectStyle}
         >
-          {GROUP_FIELDS.map(g => (
+          {visibleGroupFields.map(g => (
             <option key={g.key} value={g.key}>{`Niveau ${idx + 1} : ${g.label}`}</option>
           ))}
         </select>
