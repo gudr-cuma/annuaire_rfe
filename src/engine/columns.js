@@ -23,8 +23,8 @@ export const COLUMNS = [
 
 export const GROUP_FIELDS = [
   { key: '', label: 'Aucun regroupement' },
-  { key: 'agc', label: 'AGC' },
-  { key: 'federation', label: 'Fédération' },
+  { key: 'agc', label: 'AGC', refColumn: true },
+  { key: 'federation', label: 'Fédération', refColumn: true },
   { key: 'departement', label: 'Département' },
 ]
 

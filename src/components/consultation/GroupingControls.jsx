@@ -2,8 +2,6 @@ import { GROUP_FIELDS } from '../../engine/columns.js'
 import useDataStore from '../../store/useDataStore.js'
 import useAuthStore from '../../store/useAuthStore.js'
 
-const REF_GROUP_KEYS = new Set(['agc', 'federation'])
-
 const selectStyle = {
   padding: '7px 10px',
   border: '1px solid #E2E8F0',
@@ -33,7 +31,7 @@ export function GroupingControls({ allGroupIds }) {
 
   const visibleGroupFields = user
     ? GROUP_FIELDS
-    : GROUP_FIELDS.filter(g => !REF_GROUP_KEYS.has(g.key))
+    : GROUP_FIELDS.filter(g => !g.refColumn)
 
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px' }}>
