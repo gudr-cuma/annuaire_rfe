@@ -47,6 +47,7 @@ export function ColumnFilters() {
   const autocompleteOptions = useMemo(() => {
     const map = {}
     for (const col of COLUMNS) {
+      if (col.refColumn && !user) continue
       if (BOOL_COLUMNS[col.key] || col.statusColumn) continue
       const vals = new Set()
       for (const row of rawRows) {
