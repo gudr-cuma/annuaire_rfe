@@ -55,7 +55,7 @@ export function ConsultationPage() {
   const allGroupIds = useMemo(() => collectGroupIds(tree), [tree])
 
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
         <ImportMetaBanner meta={meta} />
         <ExportCsvButton rows={sortedFilteredRows} />

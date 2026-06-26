@@ -9,11 +9,24 @@ binding       = "DB"
 database_name = "annuaire-rfe-db"
 database_id   = "82fe91ef-b6b7-45cb-90dc-2471253fe811"
 
+# ── Cloudflare KV — Rate limiting login ───────────────────────────────────────
+[[kv_namespaces]]
+binding     = "RATE_LIMIT_KV"
+id          = "REMPLACER_PAR_ID_KV"
+
 # ── Variables d'environnement (non-secrètes) ──────────────────────────────────
 [vars]
-IMPORT_SESSION_DURATION_HOURS = "2"
+IMPORT_SESSION_DURATION_HOURS   = "2"
+SESSION_DURATION_HOURS          = "8"
+MAX_LOGIN_ATTEMPTS_PER_IP       = "5"
+RATE_LIMIT_WINDOW_SECONDS       = "900"
+ACCOUNT_LOCKOUT_ATTEMPTS        = "10"
+ACCOUNT_LOCKOUT_HOURS           = "1"
+PBKDF2_ITERATIONS               = "100000"
 
 # ── Secrets (NE PAS mettre les valeurs ici) ───────────────────────────────────
-# En local : créer un fichier .dev.vars (jamais commité) avec IMPORT_SECRET=...
+# En local : créer un fichier .dev.vars (jamais commité) avec :
+#   IMPORT_SECRET=...
+#   SESSION_SIGNING_KEY=une-clé-aléatoire-longue
 # En production : wrangler secret put IMPORT_SECRET
-#   ou Dashboard → Pages → annuaire-rfe → Settings → Environment variables → Secret
+#                 wrangler secret put SESSION_SIGNING_KEY

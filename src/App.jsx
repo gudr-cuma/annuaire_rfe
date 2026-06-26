@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import AppHeader from './components/layout/AppHeader.jsx'
-import ConsultationPage from './components/consultation/ConsultationPage.jsx'
+import MainTabs from './components/layout/MainTabs.jsx'
 import ImportPage from './components/import/ImportPage.jsx'
+import AdminPage from './components/admin/AdminPage.jsx'
 import useImportAuthStore from './store/useImportAuthStore.js'
+import useAuthStore from './store/useAuthStore.js'
 
-/** Routage minimal par pathname — 2 pages seulement, pas de dépendance react-router. */
 function useRoute() {
   const [path, setPath] = useState(window.location.pathname)
   useEffect(() => {
@@ -17,16 +18,31 @@ function useRoute() {
 
 export function App() {
   const path = useRoute()
-  const initAuth = useImportAuthStore(s => s.init)
+  const initImportAuth = useImportAuthStore(s => s.init)
+  const initAuth = useAuthStore(s => s.init)
+  const user = useAuthStore(s => s.user)
+  const initialized = useAuthStore(s => s.initialized)
 
-  useEffect(() => { initAuth() }, [initAuth])
+  useEffect(() => {
+    initImportAuth()
+    initAuth()
+  }, [initImportAuth, initAuth])
 
-  return (
-    <>
-      <AppHeader />
-      {path === '/import' ? <ImportPage /> : <ConsultationPage />}
-    </>
-  )
+  if (path === '/import') return <><AppHeader /><ImportPage /></>
+  if (path === '/admin') {
+    if (!initialized) return <AppHeader />
+    if (user && user.role === 'admin') return <><AppHeader /><AdminPage /></>
+    return (
+      <>
+        <AppHeader />
+        <div style={{ padding: '48px', textAlign: 'center', color: '#718096' }}>
+          Accès réservé aux administrateurs.
+        </div>
+      </>
+    )
+  }
+
+  return <><AppHeader /><MainTabs /></>
 }
 
 export default App
