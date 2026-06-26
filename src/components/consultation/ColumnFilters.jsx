@@ -57,7 +57,7 @@ export function ColumnFilters() {
       map[col.key] = [...vals].sort((a, b) => a.localeCompare(b, 'fr'))
     }
     return map
-  }, [rawRows])
+  }, [rawRows, user])
 
   const visibleCols = COLUMNS.filter(c => {
     if (c.statusColumn) return !!user && (c.key === 'formulaire_rempli' || c.key === 'justificatifs_envoyes')
