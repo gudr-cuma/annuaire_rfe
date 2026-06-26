@@ -1,10 +1,12 @@
 import { downloadCsv } from '../../engine/exportCsv.js'
+import useAuthStore from '../../store/useAuthStore.js'
 
 export function ExportCsvButton({ rows }) {
+  const user = useAuthStore(s => s.user)
   return (
     <button
       type="button"
-      onClick={() => downloadCsv(rows, `annuaire_rfe_${new Date().toISOString().slice(0, 10)}.csv`)}
+      onClick={() => downloadCsv(rows, `annuaire_rfe_${new Date().toISOString().slice(0, 10)}.csv`, user)}
       style={{
         padding: '7px 14px',
         borderRadius: '6px',

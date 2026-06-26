@@ -60,6 +60,7 @@ export function ColumnFilters() {
 
   const visibleCols = COLUMNS.filter(c => {
     if (c.statusColumn) return !!user && (c.key === 'formulaire_rempli' || c.key === 'justificatifs_envoyes')
+    if (c.refColumn && !user) return false
     return true
   })
 
