@@ -50,7 +50,7 @@ export async function onRequest(context) {
   if (request.method !== 'GET') return methodNotAllowed()
 
   const user = context.data?.user
-  const depts = context.data?.userDepartments ?? []
+  const depts = context.data?.userDepartments ?? [] // injecté par functions/api/_middleware.js
   const filterDepts = user && user.role !== 'admin' && depts.length > 0 ? depts : []
 
   const authenticated = !!user
