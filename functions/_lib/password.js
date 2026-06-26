@@ -42,5 +42,5 @@ export async function verifyPassword(password, storedHash) {
 }
 
 export async function dummyVerify() {
-  await deriveKey('dummy', 'dummy-salt-xxxxxxxxxxx', 100)
+  await deriveKey('dummy', 'dummy-salt-xxxxxxxxxxx', DEFAULT_ITERATIONS)
 }

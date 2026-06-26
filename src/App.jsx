@@ -21,6 +21,7 @@ export function App() {
   const initImportAuth = useImportAuthStore(s => s.init)
   const initAuth = useAuthStore(s => s.init)
   const user = useAuthStore(s => s.user)
+  const initialized = useAuthStore(s => s.initialized)
 
   useEffect(() => {
     initImportAuth()
@@ -29,6 +30,7 @@ export function App() {
 
   if (path === '/import') return <><AppHeader /><ImportPage /></>
   if (path === '/admin') {
+    if (!initialized) return <AppHeader />
     if (user && user.role === 'admin') return <><AppHeader /><AdminPage /></>
     return (
       <>

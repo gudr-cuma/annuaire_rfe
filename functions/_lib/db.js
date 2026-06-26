@@ -107,30 +107,42 @@ export async function revokeSession(db, sessionId) {
 // ── Dossier status ────────────────────────────────────────────────────────────
 
 export async function upsertDossierStatus(db, { dossierCode, formulaireRempli, justificatifsEnvoyes, commentaire, updatedBy }) {
+  const insertCols = ['dossier_code', 'updated_at', 'updated_by']
+  const insertVals = ['?', "datetime('now')", '?']
+  const insertParams = [dossierCode, updatedBy]
   const setFields = []
-  const setValues = []
+  const setParams = []
 
   if (formulaireRempli !== null) {
+    insertCols.push('formulaire_rempli')
+    insertVals.push('?')
+    insertParams.push(formulaireRempli)
     setFields.push('formulaire_rempli = ?')
-    setValues.push(formulaireRempli)
+    setParams.push(formulaireRempli)
   }
   if (justificatifsEnvoyes !== null) {
+    insertCols.push('justificatifs_envoyes')
+    insertVals.push('?')
+    insertParams.push(justificatifsEnvoyes)
     setFields.push('justificatifs_envoyes = ?')
-    setValues.push(justificatifsEnvoyes)
+    setParams.push(justificatifsEnvoyes)
   }
   if (commentaire !== null) {
+    insertCols.push('commentaire')
+    insertVals.push('?')
+    insertParams.push(commentaire)
     setFields.push('commentaire = ?')
-    setValues.push(commentaire)
+    setParams.push(commentaire)
   }
   setFields.push("updated_at = datetime('now')", 'updated_by = ?')
-  setValues.push(updatedBy)
+  setParams.push(updatedBy)
 
   await db
     .prepare(`
-      INSERT INTO dossier_status (dossier_code, updated_at, updated_by)
-      VALUES (?, datetime('now'), ?)
+      INSERT INTO dossier_status (${insertCols.join(', ')})
+      VALUES (${insertVals.join(', ')})
       ON CONFLICT(dossier_code) DO UPDATE SET ${setFields.join(', ')}
     `)
-    .bind(dossierCode, updatedBy, ...setValues)
+    .bind(...insertParams, ...setParams)
     .run()
 }
