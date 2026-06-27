@@ -25,7 +25,11 @@ const STICKY_LEFT = (() => {
 })()
 
 function widthStyle(c) {
-  return c.width ? { width: c.width, maxWidth: c.width, overflow: 'hidden', textOverflow: 'ellipsis' } : {}
+  return c.width ? { width: c.width, maxWidth: c.width } : {}
+}
+
+function innerWidth(c) {
+  return c.width ? { width: c.width, maxWidth: c.width, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}
 }
 
 function stickyStyle(c) {
@@ -64,12 +68,13 @@ function HeaderCell({ c, sortKey, sortDir, setSort }) {
 }
 
 function DataCell({ c, row }) {
+  const content = BOOL_COLUMNS[c.key] ? <StatusTag value={row[c.key]} /> : (row[c.key] || '')
   return (
     <td
-      title={c.width ? (row[c.key] || '') : undefined}
+      title={c.width && !BOOL_COLUMNS[c.key] ? (row[c.key] || '') : undefined}
       style={{ ...cellBase, ...widthStyle(c), ...stickyStyle(c), background: STICKY_KEYS.includes(c.key) ? '#fff' : undefined }}
     >
-      {BOOL_COLUMNS[c.key] ? <StatusTag value={row[c.key]} /> : (row[c.key] || '')}
+      {c.width ? <div style={innerWidth(c)}>{content}</div> : content}
     </td>
   )
 }
