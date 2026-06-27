@@ -32,12 +32,12 @@ function innerWidth(c) {
   return c.width ? { width: c.width, maxWidth: c.width, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}
 }
 
-function stickyStyle(c) {
+function stickyStyle(c, isHeader = false) {
   if (!STICKY_KEYS.includes(c.key)) return {}
   return {
     position: 'sticky',
     left: STICKY_LEFT[c.key],
-    zIndex: 2,
+    zIndex: isHeader ? 4 : 2,
   }
 }
 
@@ -56,7 +56,8 @@ function HeaderCell({ c, sortKey, sortDir, setSort }) {
         textAlign: 'left', padding: '8px 12px', background: '#F8FAFB', color: '#718096',
         textTransform: 'uppercase', fontWeight: 700, fontSize: '12px',
         borderBottom: '2px solid #E2E8F0', cursor: 'pointer', whiteSpace: 'nowrap',
-        userSelect: 'none', ...widthStyle(c), ...stickyStyle(c),
+        position: 'sticky', top: 0, zIndex: 3,
+        userSelect: 'none', ...widthStyle(c), ...stickyStyle(c, true),
       }}
     >
       {c.label}
