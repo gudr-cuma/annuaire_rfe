@@ -3,6 +3,7 @@ import { create } from 'zustand'
 const useAuthStore = create((set) => ({
   user: null,
   departments: [],
+  originalAdmin: null,
   isLoading: false,
   error: '',
   initialized: false,
@@ -11,14 +12,37 @@ const useAuthStore = create((set) => ({
     try {
       const res = await fetch('/api/auth/me', { credentials: 'same-origin' })
       if (!res.ok) {
-        set({ user: null, departments: [], initialized: true })
+        set({ user: null, departments: [], originalAdmin: null, initialized: true })
         return
       }
       const data = await res.json()
-      set({ user: data.user, departments: data.departments, initialized: true })
+      set({ user: data.user, departments: data.departments, originalAdmin: data.originalAdmin || null, initialized: true })
     } catch {
-      set({ user: null, departments: [], initialized: true })
+      set({ user: null, departments: [], originalAdmin: null, initialized: true })
     }
+  },
+
+  async impersonate(userId) {
+    await fetch('/api/admin/impersonate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ user_id: userId }),
+    })
+    const res = await fetch('/api/auth/me', { credentials: 'same-origin' })
+    const data = await res.json()
+    set({ user: data.user, departments: data.departments, originalAdmin: data.originalAdmin || null })
+    const { default: useDataStore } = await import('./useDataStore.js')
+    await useDataStore.getState().loadData()
+  },
+
+  async stopImpersonation() {
+    await fetch('/api/admin/impersonate', { method: 'DELETE', credentials: 'same-origin' })
+    const res = await fetch('/api/auth/me', { credentials: 'same-origin' })
+    const data = await res.json()
+    set({ user: data.user, departments: data.departments, originalAdmin: null })
+    const { default: useDataStore } = await import('./useDataStore.js')
+    await useDataStore.getState().loadData()
   },
 
   async login(email, password) {
@@ -37,7 +61,7 @@ const useAuthStore = create((set) => ({
       }
       const meRes = await fetch('/api/auth/me', { credentials: 'same-origin' })
       const meData = await meRes.json()
-      set({ user: meData.user, departments: meData.departments, isLoading: false, error: '' })
+      set({ user: meData.user, departments: meData.departments, originalAdmin: meData.originalAdmin || null, isLoading: false, error: '' })
       // Reload dossiers data to include status columns
       const { default: useDataStore } = await import('./useDataStore.js')
       await useDataStore.getState().loadData()

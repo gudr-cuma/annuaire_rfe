@@ -4,7 +4,7 @@ export async function onRequest(context) {
   const { request } = context
   if (request.method !== 'GET') return methodNotAllowed()
 
-  const { user, userDepartments } = context.data
+  const { user, userDepartments, realAdmin } = context.data
   return json({
     user: {
       id: user.id,
@@ -13,5 +13,8 @@ export async function onRequest(context) {
       role: user.role,
     },
     departments: userDepartments,
+    originalAdmin: realAdmin
+      ? { id: realAdmin.id, name: realAdmin.name }
+      : null,
   })
 }

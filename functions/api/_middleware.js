@@ -1,4 +1,4 @@
-import { getSessionId } from '../_lib/session.js'
+import { getSessionId, getImpUserId } from '../_lib/session.js'
 import { getSession, getUserById, getUserDepartments, updateSessionLastSeen } from '../_lib/db.js'
 import { unauthorized, forbidden } from '../_lib/responses.js'
 
@@ -26,6 +26,20 @@ export async function onRequest(context) {
         context.data.userDepartments = departments
         context.data.sessionId = sessionId
         updateSessionLastSeen(env.DB, sessionId) // non-bloquant
+
+        // Impersonation : l'admin voit l'app comme un autre utilisateur
+        if (user.role === 'admin' && !url.pathname.startsWith('/api/admin/')) {
+          const impUserId = getImpUserId(request)
+          if (impUserId) {
+            const impUser = await getUserById(env.DB, parseInt(impUserId))
+            if (impUser && impUser.is_active && impUser.role !== 'admin') {
+              const impDepts = await getUserDepartments(env.DB, impUser.id)
+              context.data.realAdmin = user
+              context.data.user = impUser
+              context.data.userDepartments = impDepts
+            }
+          }
+        }
       }
     }
   }
