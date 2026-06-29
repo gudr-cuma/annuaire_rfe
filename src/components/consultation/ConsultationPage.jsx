@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import useDataStore from '../../store/useDataStore.js'
 import { applyFilters, sortRows } from '../../engine/filterSort.js'
 import { buildGroupTree, collectGroupIds } from '../../engine/group.js'
@@ -54,6 +54,14 @@ export function ConsultationPage() {
 
   const allGroupIds = useMemo(() => collectGroupIds(tree), [tree])
 
+  const PAGE_SIZE = 15
+  const [page, setPage] = useState(0)
+
+  useEffect(() => { setPage(0) }, [filteredRows, sortKey, sortDir])
+
+  const pageCount = Math.ceil(sortedFilteredRows.length / PAGE_SIZE)
+  const pagedRows = sortedFilteredRows.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
@@ -94,7 +102,32 @@ export function ConsultationPage() {
         {isLoading ? (
           <div style={{ padding: '24px', textAlign: 'center', color: '#718096' }}>Chargement des données…</div>
         ) : levels.length === 0 ? (
-          <ResultsTable rows={sortedFilteredRows} />
+          <>
+            <ResultsTable rows={pagedRows} />
+            {pageCount > 1 && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', padding: '12px 0 4px', borderTop: '1px solid #E2E8F0', marginTop: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => setPage(p => Math.max(0, p - 1))}
+                  disabled={page === 0}
+                  style={{ padding: '6px 14px', borderRadius: '6px', border: '1px solid #E2E8F0', background: page === 0 ? '#F8FAFB' : '#FFFFFF', color: page === 0 ? '#CBD5E0' : '#1A202C', fontSize: '13px', cursor: page === 0 ? 'default' : 'pointer' }}
+                >
+                  ← Précédent
+                </button>
+                <span style={{ fontSize: '13px', color: '#718096' }}>
+                  Page {page + 1} / {pageCount}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPage(p => Math.min(pageCount - 1, p + 1))}
+                  disabled={page >= pageCount - 1}
+                  style={{ padding: '6px 14px', borderRadius: '6px', border: '1px solid #E2E8F0', background: page >= pageCount - 1 ? '#F8FAFB' : '#FFFFFF', color: page >= pageCount - 1 ? '#CBD5E0' : '#1A202C', fontSize: '13px', cursor: page >= pageCount - 1 ? 'default' : 'pointer' }}
+                >
+                  Suivant →
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <GroupedTree tree={tree} />
         )}
