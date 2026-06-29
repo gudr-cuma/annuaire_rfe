@@ -21,14 +21,16 @@ export async function onRequest(context) {
 
     return json(
       { ok: true, user: { id: target.id, name: target.name } },
-      { headers: { 'Set-Cookie': buildImpCookie(userId) } },
+      200,
+      { 'Set-Cookie': buildImpCookie(userId) },
     )
   }
 
   if (request.method === 'DELETE') {
     return json(
       { ok: true },
-      { headers: { 'Set-Cookie': clearImpCookie() } },
+      200,
+      { 'Set-Cookie': clearImpCookie() },
     )
   }
 
