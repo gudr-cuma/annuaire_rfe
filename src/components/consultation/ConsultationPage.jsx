@@ -12,6 +12,8 @@ import ImportMetaBanner from './ImportMetaBanner.jsx'
 import ExclusionsPanel from './ExclusionsPanel.jsx'
 import ErrorBanner from '../shared/ErrorBanner.jsx'
 
+const PAGE_SIZE = 15
+
 const cardStyle = {
   background: '#FFFFFF',
   border: '1px solid #E2E8F0',
@@ -54,7 +56,6 @@ export function ConsultationPage() {
 
   const allGroupIds = useMemo(() => collectGroupIds(tree), [tree])
 
-  const PAGE_SIZE = 15
   const [page, setPage] = useState(0)
 
   useEffect(() => { setPage(0) }, [filteredRows, sortKey, sortDir])
