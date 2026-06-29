@@ -106,7 +106,15 @@ export function ConsultationPage() {
           <>
             <ResultsTable rows={pagedRows} />
             {pageCount > 1 && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', padding: '12px 0 4px', borderTop: '1px solid #E2E8F0', marginTop: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 0 4px', borderTop: '1px solid #E2E8F0', marginTop: '8px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => setPage(0)}
+                  disabled={page === 0}
+                  style={{ padding: '6px 14px', borderRadius: '6px', border: '1px solid #E2E8F0', background: page === 0 ? '#F8FAFB' : '#FFFFFF', color: page === 0 ? '#CBD5E0' : '#1A202C', fontSize: '13px', cursor: page === 0 ? 'default' : 'pointer' }}
+                >
+                  ⟪ Première
+                </button>
                 <button
                   type="button"
                   onClick={() => setPage(p => Math.max(0, p - 1))}
@@ -115,9 +123,15 @@ export function ConsultationPage() {
                 >
                   ← Précédent
                 </button>
-                <span style={{ fontSize: '13px', color: '#718096' }}>
-                  Page {page + 1} / {pageCount}
-                </span>
+                <select
+                  value={page}
+                  onChange={e => setPage(Number(e.target.value))}
+                  style={{ padding: '5px 8px', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '13px', color: '#1A202C', background: '#FFFFFF', cursor: 'pointer' }}
+                >
+                  {Array.from({ length: pageCount }, (_, i) => (
+                    <option key={i} value={i}>Page {i + 1} / {pageCount}</option>
+                  ))}
+                </select>
                 <button
                   type="button"
                   onClick={() => setPage(p => Math.min(pageCount - 1, p + 1))}
@@ -125,6 +139,14 @@ export function ConsultationPage() {
                   style={{ padding: '6px 14px', borderRadius: '6px', border: '1px solid #E2E8F0', background: page >= pageCount - 1 ? '#F8FAFB' : '#FFFFFF', color: page >= pageCount - 1 ? '#CBD5E0' : '#1A202C', fontSize: '13px', cursor: page >= pageCount - 1 ? 'default' : 'pointer' }}
                 >
                   Suivant →
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPage(pageCount - 1)}
+                  disabled={page >= pageCount - 1}
+                  style={{ padding: '6px 14px', borderRadius: '6px', border: '1px solid #E2E8F0', background: page >= pageCount - 1 ? '#F8FAFB' : '#FFFFFF', color: page >= pageCount - 1 ? '#CBD5E0' : '#1A202C', fontSize: '13px', cursor: page >= pageCount - 1 ? 'default' : 'pointer' }}
+                >
+                  Dernière ⟫
                 </button>
               </div>
             )}
