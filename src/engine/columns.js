@@ -6,6 +6,9 @@ export const COLUMNS = [
   { key: 'annuaire', label: 'Annuaire', width: 100 },
   { key: 'plateforme', label: 'PA', width: 90 },
   { key: 'adresse_active', label: 'Adr. active', width: 110 },
+  { key: 'mandat_signe', label: 'Mandat sign.', statusColumn: true },
+  { key: 'formulaire_rempli', label: 'Formulaire', statusColumn: true },
+  { key: 'justificatifs_envoyes', label: 'Justificatifs', statusColumn: true },
   { key: 'departement', label: 'Département' },
   { key: 'cpostal', label: 'Code postal' },
   { key: 'ville', label: 'Ville' },
@@ -15,9 +18,7 @@ export const COLUMNS = [
   { key: 'nom_federation', label: 'Nom Fédération', width: 320, refColumn: true },
   { key: 'un_gesdosno', label: 'N° gestion dossier' },
   { key: 'adresse_facturation', label: 'Adresse de facturation' },
-  // Colonnes statut — affichées uniquement si authentifié
-  { key: 'formulaire_rempli', label: 'Formulaire', statusColumn: true },
-  { key: 'justificatifs_envoyes', label: 'Justificatifs', statusColumn: true },
+  // Commentaire statut — affiché uniquement si authentifié
   { key: 'commentaire', label: 'Commentaire', statusColumn: true },
 ]
 
@@ -32,6 +33,7 @@ export const BOOL_COLUMNS = {
   annuaire: 1,
   plateforme: 1,
   adresse_active: 1,
+  mandat_signe: 1,
   formulaire_rempli: 1,
   justificatifs_envoyes: 1,
 }

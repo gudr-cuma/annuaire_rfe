@@ -106,13 +106,20 @@ export async function revokeSession(db, sessionId) {
 
 // ── Dossier status ────────────────────────────────────────────────────────────
 
-export async function upsertDossierStatus(db, { dossierCode, formulaireRempli, justificatifsEnvoyes, commentaire, updatedBy }) {
+export async function upsertDossierStatus(db, { dossierCode, mandatSigne, formulaireRempli, justificatifsEnvoyes, commentaire, updatedBy }) {
   const insertCols = ['dossier_code', 'updated_at', 'updated_by']
   const insertVals = ['?', "datetime('now')", '?']
   const insertParams = [dossierCode, updatedBy]
   const setFields = []
   const setParams = []
 
+  if (mandatSigne !== null) {
+    insertCols.push('mandat_signe')
+    insertVals.push('?')
+    insertParams.push(mandatSigne)
+    setFields.push('mandat_signe = ?')
+    setParams.push(mandatSigne)
+  }
   if (formulaireRempli !== null) {
     insertCols.push('formulaire_rempli')
     insertVals.push('?')

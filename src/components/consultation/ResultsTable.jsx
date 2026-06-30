@@ -6,7 +6,8 @@ import useAuthStore from '../../store/useAuthStore.js'
 import StatusTag from './StatusTag.jsx'
 
 const MAIN_COLS = COLUMNS.filter(c => !c.statusColumn)
-const STATUS_COLS = COLUMNS.filter(c => c.statusColumn)
+const CHECKBOX_STATUS_COLS = COLUMNS.filter(c => c.statusColumn && c.key !== 'commentaire')
+const COMMENT_COL = COLUMNS.find(c => c.key === 'commentaire')
 
 const ACTIONS_BEFORE_KEY = 'departement'
 
@@ -201,15 +202,14 @@ export function ResultsTable({ rows }) {
             {colsBefore.map(c => (
               <HeaderCell key={c.key} c={c} sortKey={sortKey} sortDir={sortDir} setSort={setSort} />
             ))}
+            {user && CHECKBOX_STATUS_COLS.map(c => (
+              <th key={c.key} style={{ ...thBase, textAlign: 'center' }}>{c.label}</th>
+            ))}
             {authenticated && <th style={thBase}>Actions</th>}
             {colsAfter.map(c => (
               <HeaderCell key={c.key} c={c} sortKey={sortKey} sortDir={sortDir} setSort={setSort} />
             ))}
-            {user && STATUS_COLS.map(c => (
-              <th key={c.key} style={{ ...thBase, textAlign: c.key === 'commentaire' ? 'left' : 'center' }}>
-                {c.label}
-              </th>
-            ))}
+            {user && <th style={thBase}>{COMMENT_COL.label}</th>}
           </tr>
         </thead>
         <tbody>
@@ -218,6 +218,12 @@ export function ResultsTable({ rows }) {
             return (
               <tr key={`${r.siren}-${r.dossier}-${i}`}>
                 {colsBefore.map(c => <DataCell key={c.key} c={c} row={r} />)}
+                {user && CHECKBOX_STATUS_COLS.map(c => (
+                  <CheckboxCell key={c.key}
+                    dossierCode={r.dossier} field={c.key}
+                    value={r[c.key]} canEdit={editable}
+                  />
+                ))}
                 {authenticated && (
                   <td style={{ padding: '7px 12px', borderBottom: '1px solid #F0F0F0', whiteSpace: 'nowrap' }}>
                     <button
@@ -234,19 +240,9 @@ export function ResultsTable({ rows }) {
                 )}
                 {colsAfter.map(c => <DataCell key={c.key} c={c} row={r} />)}
                 {user && (
-                  <>
-                    <CheckboxCell
-                      dossierCode={r.dossier} field="formulaire_rempli"
-                      value={r.formulaire_rempli} canEdit={editable}
-                    />
-                    <CheckboxCell
-                      dossierCode={r.dossier} field="justificatifs_envoyes"
-                      value={r.justificatifs_envoyes} canEdit={editable}
-                    />
-                    <CommentCell
-                      dossierCode={r.dossier} value={r.commentaire} canEdit={editable}
-                    />
-                  </>
+                  <CommentCell
+                    dossierCode={r.dossier} value={r.commentaire} canEdit={editable}
+                  />
                 )}
               </tr>
             )

@@ -12,6 +12,7 @@ export function buildQuery({ withStatus = false, withRef = false, departements =
          CASE WHEN d.agc <> '' AND ar.code IS NOT NULL THEN ar.nom ELSE '' END AS nom_agc,` : ''
 
   const statusCols = withStatus ? `
+    , COALESCE(ds.mandat_signe, 0)          AS mandat_signe
     , COALESCE(ds.formulaire_rempli, 0)     AS formulaire_rempli
     , COALESCE(ds.justificatifs_envoyes, 0) AS justificatifs_envoyes
     , COALESCE(ds.commentaire, '')          AS commentaire` : ''

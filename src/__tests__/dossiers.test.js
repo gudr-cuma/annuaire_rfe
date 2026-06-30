@@ -22,9 +22,10 @@ describe('buildQuery', () => {
     expect(sql).toMatch(/\bAS nom_agc\b/)
   })
 
-  it('withStatus: true — inclut le LEFT JOIN dossier_status et les 3 colonnes statut', () => {
+  it('withStatus: true — inclut le LEFT JOIN dossier_status et les 4 colonnes statut', () => {
     const sql = buildQuery({ withStatus: true })
     expect(sql).toMatch(/LEFT JOIN dossier_status/)
+    expect(sql).toMatch(/mandat_signe/)
     expect(sql).toMatch(/formulaire_rempli/)
     expect(sql).toMatch(/justificatifs_envoyes/)
     expect(sql).toMatch(/commentaire/)
